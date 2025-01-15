@@ -96,7 +96,7 @@ public static class BasisNetworkServer
         string ipAddress = WebSocketChat.GetLocalIPAddress();
         listener.Prefixes.Add($"http://{ipAddress}:3000/");
         listener.Start();
-        Console.WriteLine($"WebSocket server started on ws://{ipAddress}:3000");
+        BNL.Log($"WebSocket server started on ws://{ipAddress}:3000");
         var cts = new CancellationTokenSource();
         Task.Run(() => WebSocketChat.AcceptWebsocket(listener, cts.Token));
         cts.Cancel();
