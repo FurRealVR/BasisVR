@@ -2,11 +2,16 @@ using Basis.Network.Core;
 using Basis.Network.Server;
 using Basis.Network.Server.Auth;
 using BasisServerHandle;
+using Basis.Network.Server.ChatService;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 public static class BasisNetworkServer
 {
     public static EventBasedNetListener listener;
@@ -83,6 +88,19 @@ public static class BasisNetworkServer
             BasisStatistics.StartWorkerThread(BasisNetworkServer.server);
         }
         BNL.Log("Server Worker Threads Booted");
+
+
+        // Start websocket chat server
+
+        HttpListener listener = new HttpListener();
+        string ipAddress = WebSocketChat.GetLocalIPAddress();
+        listener.Prefixes.Add($"http://{ipAddress}:3000/");
+        listener.Start();
+        Console.WriteLine($"WebSocket server started on ws://{ipAddress}:3000");
+        var cts = new CancellationTokenSource();
+        Task.Run(() => WebSocketChat.AcceptWebsocket(listener, cts.Token));
+        cts.Cancel();
+        listener.Close();
 
     }
     #region Server Setup
